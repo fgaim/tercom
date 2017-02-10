@@ -52,7 +52,7 @@ public class Parameters {
 
     // TODO: don't use Object
     public HashMap<OPTIONS, Object> getOpts(String[] args) {
-        HashMap<OPTIONS, Object> paras = new HashMap<OPTIONS, Object>();
+        HashMap<OPTIONS, Object> paras = new HashMap<>();
 
         for (int i = 0; i < args.length; ++i) {
             Matcher m = opts_p.matcher(args[i]);
@@ -202,7 +202,7 @@ public class Parameters {
     }
 
     private static ArrayList<String> getOutFormats(String s) {
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<>();
         String[] arrays = s.split(",");
         if (arrays != null) {
             for (int i = 0; i < arrays.length; ++i) {

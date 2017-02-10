@@ -27,6 +27,8 @@ import ter.io.SgmlProcessor;
 
 public class TER {
 
+    static boolean STDOUT = false;
+
     public static void main(String[] args) {
         // 1. process arguments
         Parameters para = new Parameters();
@@ -49,7 +51,7 @@ public class TER {
         }
         val = paras.get(Parameters.OPTIONS.FORMATS);
 
-        List<String> formats = new ArrayList<String>();
+        List<String> formats = new ArrayList<>();
         if (val != null) {
             formats = (List<String>) val;
         }
@@ -92,24 +94,31 @@ public class TER {
         Document refdoc = refsgm.parse(ref_fn);
         Document reflendoc = null;
 
+        // check if stdout turnedon
+        STDOUT = formats.contains("cmd");
+
         // 3. load inputs
         if (hypdoc == null) {
             hypsegs = load_segs(hyp_fn);
-            System.out.println("\"" + hyp_fn + "\" was successfully parsed as Trans text");
+            if (STDOUT) {
+                System.out.println("\"" + hyp_fn + "\" was successfully parsed as Trans text");
+            }
             in_hyp_format = 1;
         } else {
-            hypsegs = new LinkedHashMap<String, List<String>>();
+            hypsegs = new LinkedHashMap<>();
             hypsgm.loadSegs(hypdoc, hypsegs);
             in_hyp_format = 2;
         }
 
         if (refdoc == null) {
             refsegs = load_segs(ref_fn);
-            System.out.println("\"" + ref_fn + "\" was successfully parsed as Trans text");
+            if (STDOUT) {
+                System.out.println("\"" + ref_fn + "\" was successfully parsed as Trans text");
+            }
             in_ref_format = 1;
         } else {
-            refsegs = new LinkedHashMap<String, List<String>>();
-            refsids = new HashMap<String, List<String>>();
+            refsegs = new LinkedHashMap<>();
+            refsids = new HashMap<>();
             refsgm.loadSegs(refdoc, refsegs, refsids);
             in_ref_format = 2;
         }
@@ -120,10 +129,12 @@ public class TER {
 
             if (reflendoc == null) {
                 reflensegs = load_segs(reflen_fn);
-                System.out.println("\"" + reflen_fn + "\" was successfully parsed as Trans text");
+                if (STDOUT) {
+                    System.out.println("\"" + reflen_fn + "\" was successfully parsed as Trans text");
+                }
             } else {
-                reflensegs = new LinkedHashMap<String, List<String>>();
-                reflenids = new HashMap<String, List<String>>();
+                reflensegs = new LinkedHashMap<>();
+                reflenids = new HashMap<>();
                 refsgm.loadSegs(reflendoc, reflensegs, reflenids);
             }
         }
@@ -183,19 +194,21 @@ public class TER {
 
             /* Find set of refs */
             if (refsegs.containsKey(id_nrank)) {
-                System.out.println("Processing " + id);
+                if (STDOUT) {
+                    System.out.println("Processing " + id);
+                }
 
                 List<String> refids;
                 if (refsids != null && refsids.containsKey(id_nrank)) {
                     refids = refsids.get(id_nrank);
                 } else {
-                    refids = new ArrayList<String>(1);
+                    refids = new ArrayList<>(1);
                 }
 
                 List<String> reflenseglist = null;
                 if (reflensegs != null) {
                     reflenseglist = reflensegs.get(id_nrank);
-                    if (reflenseglist == null) {
+                    if (reflenseglist == null && STDOUT) {
                         System.out.println("Warning: NO reference length can be found for hyp: " + refids);
                     }
                 }
@@ -236,11 +249,15 @@ public class TER {
                         writeNbestSum(nbt_out, result, id);
                     }
                 } catch (IOException ioe) {
-                    System.out.println(ioe);
+                    if (STDOUT) {
+                        System.out.println(ioe);
+                    }
                     return;
                 }
             } else {
-                System.out.println("***ERROR*** No reference for segment " + id_nrank);
+                if (STDOUT) {
+                    System.out.println("***ERROR*** No reference for segment " + id_nrank);
+                }
                 System.exit(1);
             }
         }
@@ -251,15 +268,18 @@ public class TER {
         closeFile(ter_out, "ter", hypsgm);
         closeFile(sum_out, "sum", hypsgm);
         closeFile(nbt_out, "sum_nbest", hypsgm);
-
-        System.out.println("Total TER: " + (TOTAL_EDITS / TOTAL_WORDS) + " ("
-                + TOTAL_EDITS + "/" + TOTAL_WORDS + ")");
-        System.out.println("Number of calls to beam search: "
-                + calc.numBeamCalls());
-        System.out.println("Number of segments scored: "
-                + calc.numSegsScored());
-        System.out.println("Number of shifts tried: "
-                + calc.numShiftsTried());
+        if (STDOUT) {
+            System.out.println("Total TER: " + (TOTAL_EDITS / TOTAL_WORDS) + " ("
+                    + TOTAL_EDITS + "/" + TOTAL_WORDS + ")");
+            System.out.println("Number of calls to beam search: "
+                    + calc.numBeamCalls());
+            System.out.println("Number of segments scored: "
+                    + calc.numSegsScored());
+            System.out.println("Number of shifts tried: "
+                    + calc.numShiftsTried());
+        } else {
+            System.out.format("TER= %.2f", (TOTAL_EDITS / TOTAL_WORDS) * 100);
+        }
     }
 
     public static BufferedWriter openFile(List<String> formats,
@@ -286,7 +306,9 @@ public class TER {
                     bw.write("Hypothesis File: " + hyp_fn + "\nReference File: " + ref_fn + "\n");
                 }
             } catch (IOException ioe) {
-                System.out.println(ioe);
+                if (STDOUT) {
+                    System.out.println(ioe);
+                }
             }
         }
 
@@ -308,7 +330,6 @@ public class TER {
                 bw.close();
             } catch (IOException ioe) {
                 System.out.println(ioe);
-                return;
             }
         }
     }
@@ -331,7 +352,6 @@ public class TER {
 
         } catch (IOException ioe) {
             System.out.println(ioe);
-            return;
         }
     }
 
@@ -346,7 +366,6 @@ public class TER {
 
         } catch (IOException ioe) {
             System.out.println(ioe);
-            return;
         }
     }
 
@@ -355,10 +374,14 @@ public class TER {
             int in_hyp_format,
             List<String> out_formats) {
         if (in_ref_format != in_hyp_format) {
-            System.out.println("** Error: Both hypothesis and reference have to be in the SAME format");
+            if (STDOUT) {
+                System.out.println("** Error: Both hypothesis and reference have to be in the SAME format");
+            }
             return false;
         } else if (in_ref_format == 1 && out_formats.indexOf("xml") > -1) {
-            System.out.println("** Warning: XML ouput may not have correct doc id for Trans format inputs");
+            if (STDOUT) {
+                System.out.println("** Warning: XML ouput may not have correct doc id for Trans format inputs");
+            }
             return true;
         } else {
             return true;
@@ -383,7 +406,9 @@ public class TER {
         Alignment bestresult = null;
 
         if (has_span && refs.size() > 1) {
-            System.out.println("Error, translation spans should only be used with SINGLE reference");
+            if (STDOUT) {
+                System.out.println("Error, translation spans should only be used with SINGLE reference");
+            }
             System.exit(1);
         }
 
@@ -421,12 +446,14 @@ public class TER {
     public static Map<String, List<String>> load_segs(String fn) {
         Pattern p = Pattern.compile("^\\s*(.*?)\\s*\\(([^()]+)\\)\\s*$");
         BufferedReader stream;
-        Map<String, List<String>> segs = new LinkedHashMap<String, List<String>>();
+        Map<String, List<String>> segs = new LinkedHashMap<>();
 
         try {
             stream = new BufferedReader(new FileReader(fn));
         } catch (IOException ioe) {
-            System.out.println(ioe);
+            if (STDOUT) {
+                System.out.println(ioe);
+            }
             return null;
         }
 
@@ -443,19 +470,21 @@ public class TER {
                     List<String> val = segs.get(id);
                     List<String> al;
                     if (val == null) {
-                        al = new ArrayList<String>(6);
+                        al = new ArrayList<>(6);
                         segs.put(id, al);
                     } else {
                         al = val;
                     }
 
                     al.add(text.trim());
-                } else {
+                } else if (STDOUT) {
                     System.out.println("Warning, Invalid line: " + line);
                 }
             }
         } catch (IOException ioe) {
-            System.out.println(ioe);
+            if (STDOUT) {
+                System.out.println(ioe);
+            }
             return null;
         }
         return segs;
@@ -464,7 +493,7 @@ public class TER {
     private static HashMap<String, String> load_trans_span(String fn) {
         Pattern p = Pattern.compile("^\\s*(.*?)\\s*\\(([^()]+)\\)\\s*$");
         BufferedReader stream;
-        HashMap<String, String> spans = new HashMap<String, String>();
+        HashMap<String, String> spans = new HashMap<>();
 
         try {
             stream = new BufferedReader(new FileReader(fn));
@@ -481,16 +510,18 @@ public class TER {
                     Object val = spans.get(id);
                     if (val == null) {
                         spans.put(id, text);
-                    } else {
+                    } else if (STDOUT) {
                         System.out.println("Error, translation spans should only be used with SINGLE reference");
                         System.exit(1);
                     }
-                } else {
+                } else if (STDOUT) {
                     System.out.println("Warning, Invalid line: " + line);
                 }
             }
         } catch (IOException ioe) {
-            System.out.println(ioe);
+            if (STDOUT) {
+                System.out.println(ioe);
+            }
             return null;
         }
 
