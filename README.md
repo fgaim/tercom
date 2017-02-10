@@ -41,8 +41,7 @@ or Trans. Both reference and hypothesis files should be in the same formats.
 
 The code has been compiled into an executable jar file: tercom.jar
 
-The source files are also provided in the src/ directory.  TERtest is the main 
-executable class. 
+The source files are also provided in the src/ directory.  ter.TER is the main executable class. 
 
 References to TER should cite:
 
@@ -115,33 +114,32 @@ Source File Descriptions
 
 The primary classes of the tercom computation code are described below:
 
-TERtest - The command-line UI for the code.  Its usage is described above.
+ter.TER - The command-line UI for the code.  Its usage is described above.
 
 TERcalc - This does all of the work calculating TER.  All of the
 methods are static, so no instantiations should ever be made.  To
 calculate TER, call: TERcalc.TER(String a, String b).  This tokenizes
-and then runs TER.  It returns a TERalignment object.  If the input is
+and then runs TER.  It returns a ter.core.Alignment object.  If the input is
 pretokenized (or tokenized and then converted to another type, such as
 Integer (which give better performance)), then you can call
 TER(Comparable[], Comparable[]).  If you want to use a different
-scoring module (see TERcost class), then use the functions
-TER(Comparable[], Comparable[], TERcost) or TER(String, String,
-TERcost).
+scoring module (see ter.core.CostFunction class), then use the functions
+TER(Comparable[], Comparable[], ter.core.CostFunction) or TER(String, String,
+ter.core.CostFunction).
 
-TERshift - This is a tiny storage class, which stores the information
+ter.core.Shift - This is a tiny storage class, which stores the information
 for indiviual shifts.
 
-TERalignment - This contains the output of TER.  Some processing might
+ter.core.Alignment - This contains the output of TER.  Some processing might
 be needed to make it as pretty as TERcom pra output.
 
-TERcost - This class is used to determine the cost of insertions,
+ter.core.CostFunction - This class is used to determine the cost of insertions,
 deletions, substitutions, matches, and shifts.  The base class gives
 all edits a cost of 1, and matches a cost of 0.  If a researcher wants
 to experiment with alternative cost functions, or cost matrices, then
-a new child class of TERcost should be made that calculates those cost
-functions.  This can be passed in as the third arguement to the TER
-function of TERcalc.  It should be noted that this version of the code
+a new child class of ter.core.CostFunction should be made that calculates those cost functions. This can be passed in as the third arguement to the TER
+function of TERcalc. It should be noted that this version of the code
 only does word to word cost matrices (not phrasal matrices), and that
 all costs must be in the range of 0.0 to 1.0.
 
-TERpara - This class is used to parse the command arguments given to TERtest.
+ter.Parameters - This class is used to parse the command arguments given to ter.TER.
