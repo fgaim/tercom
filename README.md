@@ -16,6 +16,20 @@ Clone this repository, then you can either open the project in Netbeans and buil
 
 The compiled jar will be in the `dist` directory, including a distributable `.tgz` file.
 
+New Usage
+=========
+
+To simply print the total TER in percent, eg. `TER: 56.56`, use as follows:
+
+```bash
+   $ java -jar tercom.jar -r <ref_file> -h <hyp_file>
+```
+
+To see the process details in console:
+
+```bash
+   $ java -jar tercom.jar -r <ref_file> -h <hyp_file> -o cmd
+```
 
 
 ---
@@ -62,7 +76,8 @@ Currently, the following options are supported:
    -r reference file path, required.
    -h hypothesis file path, required.
    -o output formats, optional, default are all formats.
-      Valid formats include "ter", "xml", "sum", "sum_nbest" and "pra".
+      Valid formats include "cmd", "ter", "xml", "sum", "sum_nbest" and "pra".
+      "cmd", print detailed processing to stdout/console
       "ter", plain text file contains four columns: chunkid, numerrs, numwrds, ter%
       "xml", XML format with detailed alignment for each word
       "pra", plain text with alignment details, simpler than that of tercom_v6b.
