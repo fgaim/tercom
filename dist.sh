@@ -13,7 +13,7 @@ cp -r constants \
     LICENSE.txt \
     README.md \
     CHANGELOG.md \
-    tercom-$version.jar \
+    $distDir/tercom.jar \
     sample-data \
     $distDir/$dist
 
