@@ -1,3 +1,25 @@
+My Changes
+==========
+
+Made changes on the project structure and code for my own convenience.
+
+If you use this work please cite the TER paper below.
+
+Build
+=====
+
+Clone this repository, then you can either open the project in Netbeans and build from there (or) if you have `ant` installed build from console as follows:
+
+``` bash
+./dist.sh
+```
+
+The compiled jar will be in the `dist` directory, including a distributable `.tgz` file.
+
+
+
+---
+
 ------------------------------------------------------------------------
                      TRANSLATION ERROR RATE (TER) 0.8.0
 
